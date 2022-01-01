@@ -1,7 +1,7 @@
 ﻿namespace DangGlider.FlightGen.Core.Domain
 {
-    public class EntityBase
+    public abstract class EntityBase
     {
-        int Id { get; set; }
+        public int Id { get; set; }
     }
 }

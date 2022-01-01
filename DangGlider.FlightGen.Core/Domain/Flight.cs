@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DangGlider.FlightGen.Core.Domain
+﻿namespace DangGlider.FlightGen.Core.Domain
 {
-    internal class Flight
+    public class Flight : EntityBase
     {
+        public int OriginId { get; set; }
+        public virtual GeoCode Origin { get; set; }
+        public int DestinationId { get; set; }
+        public virtual GeoCode Destination { get; set; }
+        public DateTime ScheduledDeparture { get; set; }
+        public DateTime ScheduledArrival { get; set; }
+        public bool HasDeparted { get; set; }
+        public bool HasArrived { get; set; }
     }
 }
