@@ -1,3 +1,4 @@
+using DangGlider.FlightGen.API;
 using DangGlider.FlightGen.Core.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<FlightGenDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    //options.UseSqlServer(connectionString)
+    options.UseInMemoryDatabase("DangGliderFlightGen")
+);
+
+builder.Services.AddHostedService<FlightBackgroundService>();
 
 builder.Services.AddControllers();
 
@@ -19,5 +24,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+DbInitializer.Populate(app, app.Environment);
 
 app.Run();
