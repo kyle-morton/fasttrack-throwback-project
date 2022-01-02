@@ -43,18 +43,15 @@ namespace DangGlider.FlightGen.API
                     var service = scope.ServiceProvider.GetRequiredService<IFlightService>();
                     var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
-                    //if (_currentTime.Minute <= 29)
-                    //{
-                    //    await DoCreate(service, mapper, stoppingToken);
-                    //}
-                    //else
-                    //{
-                    //    // do update
-                    //}
+                    await _flightHub.Clients.All.OnTimeUpdate(_currentTime);
 
-                    await DoCreate(service, mapper, stoppingToken);
+                    if (_currentTime.Minute.IsBetween(0, 30))
+                    {
+                        await DoCreate(service, mapper, stoppingToken);
+                    }
+                    await DoUpdate(service, mapper, stoppingToken);
 
-                    await Task.Delay(5000, stoppingToken);
+                    await Task.Delay(2500, stoppingToken);
 
                     _currentTime = _currentTime.AddMinutes(30);
                 }
@@ -74,11 +71,35 @@ namespace DangGlider.FlightGen.API
             await _flightHub.Clients.All.OnCreate(dto);
         }
 
+        private async Task DoUpdate(IFlightService service, IMapper mapper, CancellationToken stoppingToken)
+        {
+            var departedFlights = await service.UpdateDepartedFlightsAsync(_currentTime, stoppingToken);
+            foreach(var flightId in departedFlights)
+            {
+                await _flightHub.Clients.All.OnDeparture(flightId);
+            }
+
+            var arrivedFlights = await service.UpdateArrivedFlightsAsync(_currentTime, stoppingToken);
+            foreach(var flightId in arrivedFlights)
+            {
+                await _flightHub.Clients.All.OnArrival(flightId);
+            }
+        }
+
         public override async Task StopAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Consume Scoped Service Hosted Service is stopping.");
 
             await base.StopAsync(stoppingToken);
+        }
+
+    }
+
+    public static class FlightServiceExtensions
+    {
+        public static bool IsBetween(this int number, int start, int end)
+        {
+            return number >= start && number <= end;
         }
     }
 

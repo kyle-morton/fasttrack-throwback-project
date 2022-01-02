@@ -1,7 +1,6 @@
 ﻿using DangGlider.FlightGen.Core.Data;
 using DangGlider.FlightGen.Core.Domain;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace DangGlider.FlightGen.Core.Services
 {
@@ -10,8 +9,8 @@ namespace DangGlider.FlightGen.Core.Services
     {
         Task<Flight> CreateAsync(Flight flight, CancellationToken cancellationToken);
         Task<Flight> CreateRandomAsync(DateTime currentTime, CancellationToken cancellationToken);
-        Task<Flight> UpdateAsync(Flight flight, CancellationToken cancellationToken);
-        Task<int> GetRandomAsync(CancellationToken cancellationToken);
+        Task<List<int>> UpdateDepartedFlightsAsync(DateTime currentTime, CancellationToken cancellationToken);
+        Task<List<int>> UpdateArrivedFlightsAsync(DateTime currentTime, CancellationToken cancellationToken);
     }
 
     public class FlightService : IFlightService
@@ -53,16 +52,6 @@ namespace DangGlider.FlightGen.Core.Services
             return flight;
         }
 
-        public Task<int> GetRandomAsync(CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Flight> UpdateAsync(Flight flight, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
         private async Task<GeoCode> GetRandomGeoCode(List<int> geoCodeIds, int idToSkip = 0)
         {
             var random = new Random();
@@ -75,6 +64,48 @@ namespace DangGlider.FlightGen.Core.Services
             }
 
             return await _context.GeoCodes.SingleOrDefaultAsync(g => g.Id == codeId);
+        }
+
+        public async Task<List<int>> UpdateDepartedFlightsAsync(DateTime currentTime, CancellationToken cancellationToken)
+        {
+            var departedFlights = await _context.Flights.Where(f => !f.HasDeparted && f.ScheduledDeparture <= currentTime).ToListAsync();
+
+            if (!departedFlights.Any())
+            {
+                return new List<int>();
+            }
+
+            var updatedFlights = new List<int>();
+            foreach (var flight in departedFlights)
+            {
+                flight.HasDeparted = true;
+                updatedFlights.Add(flight.Id);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return updatedFlights;
+        }
+
+        public async Task<List<int>> UpdateArrivedFlightsAsync(DateTime currentTime, CancellationToken cancellationToken)
+        {
+            var arrivedFlights = await _context.Flights.Where(f => !f.HasArrived && f.ScheduledArrival <= currentTime).ToListAsync();
+
+            if (!arrivedFlights.Any())
+            {
+                return new List<int>();
+            }
+
+            var updatedFlights = new List<int>();
+            foreach (var flight in arrivedFlights)
+            {
+                flight.HasArrived = true;
+                updatedFlights.Add(flight.Id);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return updatedFlights;
         }
     }
 

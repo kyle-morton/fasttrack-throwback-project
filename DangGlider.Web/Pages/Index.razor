@@ -6,6 +6,7 @@
 <PageTitle>Index</PageTitle>
 
 <h5>Flights: @flights.Count</h5>
+<p>Current Time: @currentTime.ToString("MM/dd/yyyy hh:mm tt")</p>
 
     <table class="table">
         <thead>
@@ -24,8 +25,28 @@
                     <td>@flight.Id</td>
                     <td>@flight.Origin.City, @flight.Origin.State</td>
                     <td>@flight.Destination.City, @flight.Destination.State</td>
-                    <td>@flight.ScheduledDeparture</td>
-                    <td>@flight.ScheduledArrival</td>
+                    <td>
+                        <span class="d-block">
+                            @flight.ScheduledDeparture
+                        </span>
+                        @if (flight.HasDeparted)
+                        {
+                            <span class="badge bg-success">
+                                Departed
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        <span class="d-block">
+                            @flight.ScheduledArrival
+                        </span>
+                        @if (flight.HasArrived)
+                        {
+                            <span class="badge bg-success">
+                                Arrived
+                            </span>
+                        }
+                    </td>
                 </tr>
             }
         </tbody>
@@ -35,11 +56,10 @@
     private HubConnection hubConnection;
 
     public List<FlightDto> flights;
+    public DateTime currentTime = DateTime.Now;
 
     protected override async Task OnInitializedAsync()
     {
-        //return base.OnInitializedAsync();
-
         hubConnection = new HubConnectionBuilder()
             .WithUrl("https://localhost:7007/hubs/flight")
             .Build();
@@ -50,27 +70,32 @@
             StateHasChanged();
         });
 
-        //hubConnection.On<int, ShipmentStatus>("ReceiveStatusUpdate", (shipmentId, statusId) =>
-        //{
-        //    var shipment = model.Shipments.SingleOrDefault(s => s.Id == shipmentId);
-        //    if (shipment != null)
-        //    {
-        //        shipment.Status = statusId;
-        //        shipment.ModifiedDate = DateTime.Now;
-        //        StateHasChanged();
-        //    }
-        //});
+        hubConnection.On<int>("OnDeparture", (flightId) =>
+        {
+            var flight = flights.FirstOrDefault(f => f.Id == flightId);
+            if (flight != null)
+            {
+                flight.HasDeparted = true;
+                StateHasChanged();
+            }
+        });
 
-        //hubConnection.On<int, ShipmentInvoiceStatus>("ReceiveInvoiceStatusUpdate", (shipmentId, statusId) =>
-        //{
-        //    var shipment = model.Shipments.SingleOrDefault(s => s.Id == shipmentId);
-        //    if (shipment != null)
-        //    {
-        //        shipment.InvoiceStatus = statusId;
-        //        shipment.ModifiedDate = DateTime.Now;
-        //        StateHasChanged();
-        //    }
-        //});
+        hubConnection.On<int>("OnArrival", (flightId) =>
+        {
+            var flight = flights.FirstOrDefault(f => f.Id == flightId);
+            if (flight != null)
+            {
+                flight.HasDeparted = true;
+                flight.HasArrived = true;
+                StateHasChanged();
+            }
+        });
+
+        hubConnection.On<DateTime>("OnTimeUpdate", (updatedTime) =>
+        {
+            currentTime = updatedTime;
+            StateHasChanged();
+        }); 
 
         flights = new List<FlightDto>();
         await hubConnection.StartAsync();
