@@ -1,4 +1,5 @@
 using DangGlider.FlightGen.API;
+using DangGlider.FlightGen.API.Hubs;
 using DangGlider.FlightGen.Core.Data;
 using DangGlider.FlightGen.Core.Services;
 using Microsoft.EntityFrameworkCore;
@@ -17,16 +18,23 @@ builder.Services.AddScoped<IFlightService, FlightService>();
 builder.Services.AddHostedService<FlightBackgroundService>();
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<FlightHub>("/hubs/flight");
+    endpoints.MapControllers();
+});
 
 DbInitializer.Populate(app, app.Environment);
 
