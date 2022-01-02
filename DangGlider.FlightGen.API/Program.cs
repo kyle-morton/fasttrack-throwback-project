@@ -1,5 +1,6 @@
 using DangGlider.FlightGen.API;
 using DangGlider.FlightGen.Core.Data;
+using DangGlider.FlightGen.Core.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,8 @@ builder.Services.AddDbContext<FlightGenDbContext>(options =>
     options.UseInMemoryDatabase("DangGliderFlightGen")
 );
 
+
+builder.Services.AddScoped<IFlightService, FlightService>();
 builder.Services.AddHostedService<FlightBackgroundService>();
 
 builder.Services.AddControllers();

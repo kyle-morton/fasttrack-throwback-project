@@ -1,4 +1,5 @@
 ﻿using DangGlider.FlightGen.Core.Data;
+using DangGlider.FlightGen.Core.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace DangGlider.FlightGen.API
@@ -6,6 +7,7 @@ namespace DangGlider.FlightGen.API
     public class FlightBackgroundService : BackgroundService
     {
         private readonly ILogger<FlightBackgroundService> _logger;
+        private DateTime _currentTime;
 
         public FlightBackgroundService(IServiceProvider services, ILogger<FlightBackgroundService> logger)
         {
@@ -26,16 +28,22 @@ namespace DangGlider.FlightGen.API
         {
             _logger.LogInformation("Consume Scoped Service Hosted Service is working.");
 
-            while(!stoppingToken.IsCancellationRequested)
+            _currentTime = DateTime.Now;
+
+            while (!stoppingToken.IsCancellationRequested)
             {
                 using (var scope = Services.CreateScope())
                 {
-                    var context = scope.ServiceProvider.GetRequiredService<FlightGenDbContext>();
-                    var geocodes = await context.GeoCodes.ToListAsync(stoppingToken);
+                    var service = scope.ServiceProvider.GetRequiredService<IFlightService>();
 
-                    _logger.LogInformation("Geocodes found: " + geocodes.Count);
+                    var newFlight = await service.CreateRandomAsync(_currentTime, stoppingToken);
+
+                    _logger.LogInformation("New Flight: " + newFlight.Id + " " + newFlight.Origin.City + " - to - " + newFlight.Destination.City);
+                    _logger.LogInformation("Departure: " + newFlight.ScheduledDeparture.ToString("MM/dd/yy hh:mm tt") + " - Arrival: " + newFlight.ScheduledArrival.ToString("MM/dd/yy hh:mm tt"));
 
                     await Task.Delay(5000, stoppingToken);
+
+                    _currentTime = _currentTime.AddMinutes(30);
                 }
             }
 

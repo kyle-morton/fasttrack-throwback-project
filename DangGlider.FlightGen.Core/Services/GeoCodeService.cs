@@ -6,7 +6,4 @@ using System.Threading.Tasks;
 
 namespace DangGlider.FlightGen.Core.Services
 {
-    internal class GeoCodeService
-    {
-    }
 }
