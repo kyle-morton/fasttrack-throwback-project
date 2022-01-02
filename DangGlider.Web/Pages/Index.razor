@@ -1,9 +1,78 @@
 ﻿@page "/"
 
+@using DangGlider.Web.Dto
+@using Microsoft.AspNetCore.SignalR.Client
+
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<h5>Flights: @flights.Count</h5>
 
-Welcome to your new app.
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Departure</th>
+                <th>Arrival</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var flight in flights)
+            {
+                <tr>
+                    <td>@flight.Id</td>
+                    <td>@flight.Origin.City, @flight.Origin.State</td>
+                    <td>@flight.Destination.City, @flight.Destination.State</td>
+                    <td>@flight.ScheduledDeparture</td>
+                    <td>@flight.ScheduledArrival</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    private HubConnection hubConnection;
+
+    public List<FlightDto> flights;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //return base.OnInitializedAsync();
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://localhost:7007/hubs/flight")
+            .Build();
+
+        hubConnection.On<FlightDto>("OnCreate", (flight) =>
+        {
+            flights.Add(flight);
+            StateHasChanged();
+        });
+
+        //hubConnection.On<int, ShipmentStatus>("ReceiveStatusUpdate", (shipmentId, statusId) =>
+        //{
+        //    var shipment = model.Shipments.SingleOrDefault(s => s.Id == shipmentId);
+        //    if (shipment != null)
+        //    {
+        //        shipment.Status = statusId;
+        //        shipment.ModifiedDate = DateTime.Now;
+        //        StateHasChanged();
+        //    }
+        //});
+
+        //hubConnection.On<int, ShipmentInvoiceStatus>("ReceiveInvoiceStatusUpdate", (shipmentId, statusId) =>
+        //{
+        //    var shipment = model.Shipments.SingleOrDefault(s => s.Id == shipmentId);
+        //    if (shipment != null)
+        //    {
+        //        shipment.InvoiceStatus = statusId;
+        //        shipment.ModifiedDate = DateTime.Now;
+        //        StateHasChanged();
+        //    }
+        //});
+
+        flights = new List<FlightDto>();
+        await hubConnection.StartAsync();
+    }
+}

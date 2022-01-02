@@ -6,10 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<FlightGenDbContext>(options =>
-    //options.UseSqlServer(connectionString)
+    //options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
     options.UseInMemoryDatabase("DangGliderFlightGen")
 );
 
@@ -19,6 +17,8 @@ builder.Services.AddHostedService<FlightBackgroundService>();
 
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
