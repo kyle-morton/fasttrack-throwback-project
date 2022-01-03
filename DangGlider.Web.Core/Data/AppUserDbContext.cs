@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace DangGlider.Web.Data
+namespace DangGlider.Web.Core.Data
 {
     public class AppUserDbContext : IdentityDbContext
     {

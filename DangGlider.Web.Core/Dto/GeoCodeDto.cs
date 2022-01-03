@@ -1,4 +1,4 @@
-﻿namespace DangGlider.Web.Dto
+﻿namespace DangGlider.Web.Core.Dto
 {
     public class GeoCodeDto
     {

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 
-namespace DangGlider.Web.Data.Migrations
+namespace DangGlider.Web.Core.Data.Migrations
 {
     public partial class CreateIdentitySchema : Migration
     {

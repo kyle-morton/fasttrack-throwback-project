@@ -1,4 +1,4 @@
-﻿using DangGlider.Web.Dto;
+﻿using DangGlider.Web.Core.Dto;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace DangGlider.Web

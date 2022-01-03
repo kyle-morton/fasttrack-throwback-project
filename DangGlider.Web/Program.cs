@@ -1,6 +1,6 @@
 using DangGlider.Web;
 using DangGlider.Web.Areas.Identity;
-using DangGlider.Web.Data;
+using DangGlider.Web.Core.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

@@ -5,9 +5,11 @@ VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DangGlider.Web", "DangGlider.Web\DangGlider.Web.csproj", "{5B41627B-6937-4FF3-9353-9C9016384765}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DangGlider.FlightGen.API", "DangGlider.FlightGen.API\DangGlider.FlightGen.API.csproj", "{299B5D80-A3A5-4449-9C52-58B89ABBF6EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DangGlider.FlightGen.API", "DangGlider.FlightGen.API\DangGlider.FlightGen.API.csproj", "{299B5D80-A3A5-4449-9C52-58B89ABBF6EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DangGlider.FlightGen.Core", "DangGlider.FlightGen.Core\DangGlider.FlightGen.Core.csproj", "{311C1B82-80AC-45CE-9C60-2443268CF808}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DangGlider.FlightGen.Core", "DangGlider.FlightGen.Core\DangGlider.FlightGen.Core.csproj", "{311C1B82-80AC-45CE-9C60-2443268CF808}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DangGlider.Web.Core", "DangGlider.Web.Core\DangGlider.Web.Core.csproj", "{BEF8F5FB-9243-4013-9177-375AA066BFFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{311C1B82-80AC-45CE-9C60-2443268CF808}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{311C1B82-80AC-45CE-9C60-2443268CF808}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{311C1B82-80AC-45CE-9C60-2443268CF808}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEF8F5FB-9243-4013-9177-375AA066BFFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEF8F5FB-9243-4013-9177-375AA066BFFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEF8F5FB-9243-4013-9177-375AA066BFFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEF8F5FB-9243-4013-9177-375AA066BFFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
