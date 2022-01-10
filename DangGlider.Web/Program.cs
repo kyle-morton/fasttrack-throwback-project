@@ -11,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppUserDbContext>(options =>
     options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<DangGliderDbContext>(options =>
+    options.UseInMemoryDatabase("DangGlider.App"));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<AppUserDbContext>();
@@ -38,6 +40,8 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 app.UseRouting();
 
 app.UseAuthentication();
@@ -46,5 +50,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+DbInitializer.Populate(app, app.Environment);
 
 app.Run();

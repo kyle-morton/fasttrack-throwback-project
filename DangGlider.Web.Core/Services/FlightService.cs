@@ -1,12 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DangGlider.Web.Core.Data;
 
 namespace DangGlider.Web.Core.Services
 {
-    internal class FlightService
+    public interface IFlightService
     {
+
+    }
+
+    public class FlightService : IFlightService
+    {
+        private DangGliderDbContext _context { get; }
+
+        public FlightService(DangGliderDbContext context)
+        {
+            _context = context;
+        }
+
+        
+
     }
 }
