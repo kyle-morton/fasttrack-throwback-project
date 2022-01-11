@@ -22,6 +22,8 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 
 builder.Services.AddHostedService<FlightHubBackgroundService>();
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -39,8 +41,6 @@ else
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 app.UseRouting();
 

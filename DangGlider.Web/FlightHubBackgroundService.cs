@@ -20,15 +20,13 @@ namespace DangGlider.Web
     {
 
         private readonly ILogger<FlightHubBackgroundService> _logger;
-        private readonly DangGliderDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly IServiceProvider _services;
         private HubConnection _connection;
 
-        public FlightHubBackgroundService(ILogger<FlightHubBackgroundService> logger, DangGliderDbContext context, IMapper mapper)
+        public FlightHubBackgroundService(IServiceProvider services, ILogger<FlightHubBackgroundService> logger, IMapper mapper)
         {
             _logger = logger;
-            _context = context;
-            _mapper = mapper;
+            _services = services;
 
             _connection = new HubConnectionBuilder()
                 .WithUrl("https://localhost:7007/hubs/flight")
@@ -40,11 +38,28 @@ namespace DangGlider.Web
             _connection.On<DateTime>("OnTimeUpdate", OnTimeUpdate);
         }
 
+        private IServiceScope getScope()
+        {
+            return _services.CreateScope();
+        }
+
+        private DangGliderDbContext getContext(IServiceScope scope)
+        {
+            return scope.ServiceProvider.GetRequiredService<DangGliderDbContext>();
+        }
+
+        private IMapper getMapper(IServiceScope scope)
+        {
+            return scope.ServiceProvider.GetRequiredService<IMapper>();
+        }
+
         public async Task OnArrival(int flightId)
         {
             _logger.LogInformation("Arrived: {flightId}", flightId);
+            var scope = getScope();
+            var context = getContext(scope);
 
-            var flight = await _context.Flights.SingleOrDefaultAsync(f => f.FlightNumber == flightId);
+            var flight = await context.Flights.SingleOrDefaultAsync(f => f.FlightNumber == flightId);
 
             if (flight == null)
             {
@@ -52,45 +67,59 @@ namespace DangGlider.Web
             }
 
             flight.HasArrived = true;
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
+
+            scope.Dispose();
         }
 
         public async Task OnCreate(FlightDto flightDto)
         {
             _logger.LogInformation("Created: {flightId}", flightDto.Id);
 
-            var originGeoCode = await _context.GeoCodes.FirstOrDefaultAsync(g => g.City == flightDto.Origin.City && g.State == flightDto.Origin.State);
-            var destGeoCode = await _context.GeoCodes.FirstOrDefaultAsync(g => g.City == flightDto.Destination.City && g.State == flightDto.Destination.State);
+            var scope = getScope();
+            var context = getContext(scope);
+            var mapper = getMapper(scope);
+
+            var originGeoCode = await context.GeoCodes.FirstOrDefaultAsync(g => g.City == flightDto.Origin.City && g.State == flightDto.Origin.State);
+            var destGeoCode = await context.GeoCodes.FirstOrDefaultAsync(g => g.City == flightDto.Destination.City && g.State == flightDto.Destination.State);
 
             if (originGeoCode == null || destGeoCode == null)
             {
+                scope.Dispose();
                 return;
             }
 
-            var flight = _mapper.Map<Flight>(flightDto);
+            var flight = mapper.Map<Flight>(flightDto);
             flight.FlightNumber = flight.Id;
             flight.Id = 0;
             flight.Origin = flight.Destination = null;
             flight.OriginId = originGeoCode.Id;
             flight.DestinationId = destGeoCode.Id;
 
-            await _context.Flights.AddAsync(flight);
-            await _context.SaveChangesAsync();
+            await context.Flights.AddAsync(flight);
+            await context.SaveChangesAsync();
+
+            scope.Dispose();
         }
 
         public async Task OnDeparture(int flightId)
         {
             _logger.LogInformation("Departed: {flightId}", flightId);
 
-            var flight = await _context.Flights.SingleOrDefaultAsync(f => f.FlightNumber == flightId);
+            var scope = getScope();
+            var context = getContext(scope);
+
+            var flight = await context.Flights.SingleOrDefaultAsync(f => f.FlightNumber == flightId);
 
             if (flight == null)
             {
+                scope.Dispose();
                 return;
             }
 
             flight.HasDeparted = true;
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
+            scope.Dispose();
         }
 
         public Task OnTimeUpdate(DateTime currentTime)

@@ -10,18 +10,18 @@ namespace DangGlider.FlightGen.API
 {
     public class FlightBackgroundService : BackgroundService
     {
+        private readonly IServiceProvider _services;
         private readonly ILogger<FlightBackgroundService> _logger;
         private readonly IHubContext<FlightHub, IFlightHub> _flightHub;
         private DateTime _currentTime;
 
         public FlightBackgroundService(IServiceProvider services, ILogger<FlightBackgroundService> logger, IHubContext<FlightHub, IFlightHub> flightHub)
         {
-            Services = services;
+            _services = services;
             _logger = logger;
             _flightHub = flightHub;
         }
-
-        public IServiceProvider Services { get; }
+        
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -38,7 +38,7 @@ namespace DangGlider.FlightGen.API
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                using (var scope = Services.CreateScope())
+                using (var scope = _services.CreateScope())
                 {
                     var service = scope.ServiceProvider.GetRequiredService<IFlightService>();
                     var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();

@@ -60,44 +60,44 @@
 
     protected override async Task OnInitializedAsync()
     {
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7007/hubs/flight")
-            .Build();
+        //hubConnection = new HubConnectionBuilder()
+        //    .WithUrl("https://localhost:7007/hubs/flight")
+        //    .Build();
 
-        hubConnection.On<FlightDto>("OnCreate", (flight) =>
-        {
-            flights.Add(flight);
-            StateHasChanged();
-        });
+        //hubConnection.On<FlightDto>("OnCreate", (flight) =>
+        //{
+        //    flights.Add(flight);
+        //    StateHasChanged();
+        //});
 
-        hubConnection.On<int>("OnDeparture", (flightId) =>
-        {
-            var flight = flights.FirstOrDefault(f => f.Id == flightId);
-            if (flight != null)
-            {
-                flight.HasDeparted = true;
-                StateHasChanged();
-            }
-        });
+        //hubConnection.On<int>("OnDeparture", (flightId) =>
+        //{
+        //    var flight = flights.FirstOrDefault(f => f.Id == flightId);
+        //    if (flight != null)
+        //    {
+        //        flight.HasDeparted = true;
+        //        StateHasChanged();
+        //    }
+        //});
 
-        hubConnection.On<int>("OnArrival", (flightId) =>
-        {
-            var flight = flights.FirstOrDefault(f => f.Id == flightId);
-            if (flight != null)
-            {
-                flight.HasDeparted = true;
-                flight.HasArrived = true;
-                StateHasChanged();
-            }
-        });
+        //hubConnection.On<int>("OnArrival", (flightId) =>
+        //{
+        //    var flight = flights.FirstOrDefault(f => f.Id == flightId);
+        //    if (flight != null)
+        //    {
+        //        flight.HasDeparted = true;
+        //        flight.HasArrived = true;
+        //        StateHasChanged();
+        //    }
+        //});
 
-        hubConnection.On<DateTime>("OnTimeUpdate", (updatedTime) =>
-        {
-            currentTime = updatedTime;
-            StateHasChanged();
-        }); 
+        //hubConnection.On<DateTime>("OnTimeUpdate", (updatedTime) =>
+        //{
+        //    currentTime = updatedTime;
+        //    StateHasChanged();
+        //}); 
 
+        //await hubConnection.StartAsync();
         flights = new List<FlightDto>();
-        await hubConnection.StartAsync();
     }
 }
