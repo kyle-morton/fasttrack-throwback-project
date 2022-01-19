@@ -1,8 +1,11 @@
 using DangGlider.Web;
 using DangGlider.Web.Areas.Identity;
 using DangGlider.Web.Core.Data;
+using DangGlider.Web.Core.Services;
+using DangGlider.Web.Hubs;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,9 +25,20 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 
 builder.Services.AddHostedService<FlightHubBackgroundService>();
 
+builder.Services.AddTransient<IFlightService, FlightService>();
+builder.Services.AddTransient<IGeoCodeService, GeoCodeService>();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
+
 var app = builder.Build();
+
+app.UseResponseCompression();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -49,6 +63,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapBlazorHub();
+app.MapHub<FlightHub>("/hubs/flight");
 app.MapFallbackToPage("/_Host");
 
 DbInitializer.Populate(app, app.Environment);
