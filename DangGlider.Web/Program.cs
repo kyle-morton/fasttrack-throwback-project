@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppUserDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseInMemoryDatabase("DangGlider.App"));
 builder.Services.AddDbContext<DangGliderDbContext>(options =>
     options.UseInMemoryDatabase("DangGlider.App"));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
