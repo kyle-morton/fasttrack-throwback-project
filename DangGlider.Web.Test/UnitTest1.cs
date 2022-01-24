@@ -48,6 +48,7 @@ public class Tests
 
     public FlightOption GetOption(List<TestableFlight> flights, TestableFlight flightPickingUp, string destination, DateTime arrivalTime)
     {
+        return new FlightOption();
         // bubble up ON -> 1) found a flight that hits our destination 2) no more options
         // keep digging ON -> 1) found a flight that leaves our pick up
     }
